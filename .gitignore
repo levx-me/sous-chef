@@ -1,0 +1,23 @@
+# Node
+node_modules/
+
+# Hardhat
+cache/
+abis/
+artifacts/
+
+# Env
+.env
+
+# Coverage
+coverage/
+coverage.json
+
+# History
+.history/
+
+# Typechain
+/typechain/
+
+# DS_Store
+.DS_Store

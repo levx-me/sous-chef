@@ -1,0 +1,109 @@
+{
+  "name": "@sushiswap/sous-chef",
+  "version": "1.0.0-alpha.0",
+  "description": "Sous-chef contracts",
+  "keywords": [
+    "solidity",
+    "sous-chef"
+  ],
+  "homepage": "https://https://github.com/levx-io/sous-chef#readme",
+  "bugs": {
+    "url": "https://https://github.com/levx-io/sous-chef/issues",
+    "email": "thegreathb@levx.io"
+  },
+  "license": "MIT",
+  "author": "TheGreatHB <thegreathb@levx.io>",
+  "files": [
+    "abis",
+    "contracts",
+    "deployments",
+    "exports",
+    "typechain"
+  ],
+  "scripts": {
+    "build": "rimraf abis artifacts cache coverage typechain && hardhat compile",
+    "console": "hardhat console",
+    "hardhat:deploy": "hardhat --network hardhat deploy",
+    "mainnet:deploy": "hardhat --network mainnet deploy",
+    "mainnet:verify": "hardhat --network mainnet etherscan-verify --solc-input --license MIT",
+    "mainnet:export": "hardhat --network mainnet export",
+    "testnet:deploy": "yarn ropsten:deploy && yarn rinkeby:deploy && yarn goerli:deploy && yarn kovan:deploy && yarn moonbase:deploy && yarn arbitrum:deploy",
+    "ropsten:deploy": "hardhat --network ropsten deploy",
+    "ropsten:verify": "hardhat --network ropsten etherscan-verify --solc-input --license MIT",
+    "ropsten:export": "hardhat --network ropsten export --export exports/ropsten.json",
+    "rinkeby:deploy": "hardhat --network rinkeby deploy",
+    "rinkeby:verify": "hardhat --network rinkeby etherscan-verify --solc-input --license MIT",
+    "rinkeby:export": "hardhat --network rinkeby export --export exports/rinkeby.json",
+    "goerli:deploy": "hardhat --network goerli deploy",
+    "goerli:verify": "hardhat --network goerli etherscan-verify --solc-input --license MIT",
+    "goerli:export": "hardhat --network goerli export --export exports/goerli.json",
+    "kovan:deploy": "hardhat --network kovan deploy",
+    "kovan:export": "hardhat --network kovan export --export exports/kovan.json",
+    "kovan:verify": "hardhat --network kovan etherscan-verify --solc-input --license MIT",
+    "moonbase:deploy": "hardhat --network moonbase deploy",
+    "moonbase:export": "hardhat --network moonbase export --export exports/moonbase.json",
+    "arbitrum:deploy": "hardhat --network arbitrum deploy",
+    "arbitrum:export": "hardhat --network arbitrum export --export exports/arbitrum.json",
+    "test": "rimraf test/typechain && cross-env TS_NODE_TRANSPILE_ONLY=1 hardhat test",
+    "test:coverage": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" hardhat coverage --testfiles \"test/*.test.ts\"",
+    "test:gas": "cross-env REPORT_GAS=true yarn test",
+    "prepublishOnly": "yarn build",
+    "pretty": "prettier --write contracts/**/*.sol"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --cache --fix",
+      "prettier --write"
+    ],
+    "*.sol": [
+      "solhint -c .solhint.json",
+      "prettier --write",
+      "yarn test"
+    ],
+    "*.md": "prettier --write"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-conventional": "^11.0.0",
+    "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers",
+    "@nomiclabs/hardhat-etherscan": "^2.1.6",
+    "@nomiclabs/hardhat-solhint": "^2.0.0",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@tenderly/hardhat-tenderly": "^1.0.12",
+    "@typechain/ethers-v5": "^7.1.2",
+    "@typechain/hardhat": "^2.3.0",
+    "@types/chai": "^4.2.22",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^16.10.1",
+    "@typescript-eslint/eslint-plugin": "^4.31.2",
+    "@typescript-eslint/parser": "^4.31.2",
+    "chai": "^4.3.4",
+    "cross-env": "^7.0.3",
+    "dotenv": "^10.0.0",
+    "eslint": "^7.32.0",
+    "ethereum-waffle": "^3.4.0",
+    "ethers": "^5.4.7",
+    "hardhat": "^2.6.4",
+    "hardhat-abi-exporter": "^2.3.0",
+    "hardhat-deploy": "^0.9.1",
+    "hardhat-gas-reporter": "^1.0.4",
+    "hardhat-log-remover": "^2.0.2",
+    "hardhat-preprocessor": "^0.1.4",
+    "hardhat-spdx-license-identifier": "^2.0.3",
+    "hardhat-watcher": "^2.1.1",
+    "husky": "^7.0.2",
+    "lint-staged": "^11.1.2",
+    "prettier": "^2.4.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.18",
+    "readline-sync": "^1.4.10",
+    "rimraf": "^3.0.2",
+    "solidity-coverage": "^0.7.17",
+    "ts-generator": "^0.1.1",
+    "ts-node": "^10.2.1",
+    "typechain": "^5.1.2",
+    "typescript": "^4.4.3"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.3.2"
+  }
+}
