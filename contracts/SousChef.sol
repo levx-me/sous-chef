@@ -194,7 +194,8 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
         returns (uint256 sushiReward)
     {
         require(yieldTokenAmount > 0, "SOUSCHEF: AMOUNT_ZERO");
-        return _burnYieldToken(yieldToken, yieldTokenAmount);
+        sushiReward = _burnYieldToken(yieldToken, yieldTokenAmount);
+        safeSushiTransfer(msg.sender, sushiReward);
     }
 
     function _burnYieldToken(ISushiYieldToken yieldToken, uint256 yieldTokenAmount)
@@ -212,7 +213,6 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
         if (address(strategy) != address(0)) {
             try strategy.claimReward(msg.sender, yieldTokenAmount) {} catch {}
         }
-        safeSushiTransfer(msg.sender, sushiReward);
     }
 
     function _claim(uint256 pid, ISushiYieldToken yieldToken) internal returns (uint256 reward) {
