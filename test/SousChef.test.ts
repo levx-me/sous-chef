@@ -57,22 +57,16 @@ const setupTest = async () => {
 };
 
 describe("SousChef", () => {
-    // beforeEach(async () => {
-    //     await ethers.provider.send("hardhat_reset", []);
-    // });
+    beforeEach(async () => {
+        await ethers.provider.send("hardhat_reset", []);
+    });
 
-    it("-", async () => {
+    it("overall test-1", async () => {
         const { deployer, alice, bob, carol, sChef, masterChef, sushiBar, sushi, lp } = await setupTest();
 
-        // console.log((await sushiBar.totalSupply()).toString());
+        expect(await sushiBar.totalSupply()).to.be.equal(0);
 
-        // await expect(() => sushiBar.enter(10000)).to.changeTokenBalance(sushiBar, deployer, 10000);
-        // await sushi.connect(deployer).transfer(sushiBar.address, 10000);
-        // await expect(() => sushiBar.leave(10000)).to.changeTokenBalance(sushi, deployer, 20000);
-
-        // console.log(await sChef.yTokenInfoOf(0));
         await sChef.createYieldTokens([0], [AddressZero]);
-        // console.log(await sChef.yTokenInfoOf(0));
         const ytoken = (await ethers.getContractAt(
             "SushiYieldToken",
             (
@@ -127,12 +121,13 @@ describe("SousChef", () => {
         expect(await ytoken.balanceOf(alice.address)).to.be.equal(rpb * 8.5);
         expect(await ytoken.balanceOf(bob.address)).to.be.equal(rpb);
 
-        // console.log((await sushi.balanceOf(sushiBar.address)).toString());
-
-        await expect(() => sChef.connect(alice).burnYieldToken(ytoken.address, rpb)).to.changeTokenBalances(sushi, [alice], [rpb]); //111_ab
+        await expect(() => sChef.connect(alice).burnYieldToken(ytoken.address, rpb)).to.changeTokenBalances(
+            sushi,
+            [alice],
+            [rpb]
+        ); //111_ab
         expect(await ytoken.balanceOf(alice.address)).to.be.equal(rpb * 7.5);
         expect(await ytoken.balanceOf(bob.address)).to.be.equal(rpb);
-        // console.log((await sushi.balanceOf(sushiBar.address)).toString());
 
         expect(await sChef.sushiRewardPerYieldToken()).to.be.equal(1);
         expect(await sushi.balanceOf(sushiBar.address)).to.be.equal(rpb * 9);
@@ -149,8 +144,6 @@ describe("SousChef", () => {
         expect(await ytoken.balanceOf(bob.address)).to.be.equal(rpb);
 
         await masterChef.add(100, alice.address, true); //114
-        // console.log((await ytoken.balanceOf(alice.address)).toString())
-        // console.log((await ytoken.balanceOf(bob.address)).toString())
 
         await autoMining(false);
         await sChef.connect(alice).deposit(0, 0);
@@ -177,17 +170,17 @@ describe("SousChef", () => {
         //     console.log((await sushi.balanceOf(bob.address)).toString()); //57500
         // }
 
-        await ytoken.connect(alice).transfer(carol.address, 76250); //116
-        await sChef.connect(carol).burnYieldToken(ytoken.address, 76250);    //117
-        console.log((await sushi.balanceOf(carol.address)).toString()); //152500
+        // {
+        //     await ytoken.connect(alice).transfer(carol.address, 76250); //116
+        //     await sChef.connect(carol).burnYieldToken(ytoken.address, 76250); //117
+        //     console.log((await sushi.balanceOf(carol.address)).toString()); //152500
 
-        console.log((await sushi    .balanceOf(sChef.address)).toString()); //0
-        console.log((await sushi.balanceOf(alice.address)).toString()); //30000
-        console.log((await sushi.balanceOf(bob.address)).toString());   //0
+        //     console.log((await sushi.balanceOf(sChef.address)).toString()); //0
+        //     console.log((await sushi.balanceOf(alice.address)).toString()); //30000
+        //     console.log((await sushi.balanceOf(bob.address)).toString()); //0
 
-        console.log((await sushi.balanceOf(sushiBar.address)).toString()); //52500
-        console.log((await sushiBar.balanceOf(sChef.address)).toString()); //26250
-
-        
+        //     console.log((await sushi.balanceOf(sushiBar.address)).toString()); //52500
+        //     console.log((await sushiBar.balanceOf(sChef.address)).toString()); //26250
+        // }
     });
 });
