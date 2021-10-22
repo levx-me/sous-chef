@@ -80,7 +80,7 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
 
     function updateStrategy(uint256 pid, IMultipleRewardStrategy strategy) external onlyOwner {
         YieldTokenInfo storage _yInfo = yTokenInfoOf[pid];
-        require(address(_yInfo.lpToken) == address(0), "SOUSCHEF: YIELD_TOKEN_EXISTS");
+        require(address(_yInfo.lpToken) != address(0), "SOUSCHEF: YIELD_TOKEN_NOT_EXISTS");
         _yInfo.strategy = strategy;
         emit UpdateMultipleRewardStrategy(pid, address(_yInfo.lpToken), address(_yInfo.yieldToken), address(strategy));
     }
