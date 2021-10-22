@@ -21,26 +21,26 @@ abstract contract MasterChefModule is IMasterChefModule {
 
     function _pendingSushiReward(
         uint256 _pid,
-        uint256 supportedLPTokenAmount,
+        uint256 lpTokenAmount,
         uint256 sushiRewardDebt
     ) internal view returns (uint256) {
         RewardPoolInfo memory _poolInfo = rewardPoolInfo[_pid];
-        uint256 _totalSupportedLPTokenAmount = masterChef.userInfo(_pid, address(this)).amount;
+        uint256 _totalLPsupply = masterChef.userInfo(_pid, address(this)).amount;
 
         uint256 _accSushiPerShare = _poolInfo.accSushiPerShare;
-        if (block.number > _poolInfo.lastRewardBlock && _totalSupportedLPTokenAmount != 0) {
+        if (block.number > _poolInfo.lastRewardBlock && _totalLPsupply != 0) {
             uint256 reward = masterChef.pendingSushi(_pid, address(this));
-            _accSushiPerShare += ((reward * PRECISION) / _totalSupportedLPTokenAmount);
+            _accSushiPerShare += ((reward * PRECISION) / _totalLPsupply);
         }
 
-        return (supportedLPTokenAmount * _accSushiPerShare) / PRECISION - sushiRewardDebt;
+        return (lpTokenAmount * _accSushiPerShare) / PRECISION - sushiRewardDebt;
     }
 
     function _toSushiMasterChef(
         bool deposit,
         uint256 _pid,
         uint256 _amount,
-        uint256 _totalSupportedLPTokenAmount
+        uint256 _totalLPsupply
     ) internal returns (uint256 _accSushiPerShare, uint256 reward) {
         RewardPoolInfo storage _poolInfo = rewardPoolInfo[_pid];
         if (block.number <= _poolInfo.lastRewardBlock) {
@@ -55,8 +55,8 @@ abstract contract MasterChefModule is IMasterChefModule {
             reward = balance1 - balance0;
         }
         _poolInfo.lastRewardBlock = block.number;
-        if (_totalSupportedLPTokenAmount > 0 && reward > 0) {
-            _accSushiPerShare = _poolInfo.accSushiPerShare + ((reward * PRECISION) / _totalSupportedLPTokenAmount);
+        if (_totalLPsupply > 0 && reward > 0) {
+            _accSushiPerShare = _poolInfo.accSushiPerShare + ((reward * PRECISION) / _totalLPsupply);
             _poolInfo.accSushiPerShare = _accSushiPerShare;
             return (_accSushiPerShare, reward);
         } else {
