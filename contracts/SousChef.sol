@@ -224,7 +224,7 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
 
         reward = (userAmount * accSushiPerShare) / PRECISION - _userInfo.rewardDebt;
         _userInfo.rewardDebt = (userAmount * accSushiPerShare) / PRECISION;
-        emit Claimed(address(yieldToken), msg.sender);
+        emit Claimed(address(yieldToken), reward, msg.sender);
     }
 
     function claimSushiRewardWithBurningYieldToken(uint256 pid, uint256 yieldTokenAmount)

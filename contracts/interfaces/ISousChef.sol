@@ -16,7 +16,7 @@ interface ISousChef {
     );
     event Deposited(address indexed yieldToken, uint256 amount, address indexed to);
     event Withdrawn(address indexed yieldToken, uint256 amount, address indexed to);
-    event Claimed(address indexed yieldToken, address indexed to);
+    event Claimed(address indexed yieldToken, uint256 amount, address indexed to);
 
     function sushiBar() external view returns (ISushiBar);
 
