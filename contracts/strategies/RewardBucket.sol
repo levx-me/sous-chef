@@ -58,6 +58,12 @@ contract RewardBucket is Ownable, IMultipleRewardStrategy {
         }
     }
 
+    function withdrawRewardTokens(address to, uint256[] calldata ids, uint256[] calldata amounts) external onlyOwner {
+        for (uint256 i = 0; i < ids.length; i++) {
+            safeTokenTransfer(IERC20(rewardTokens[ids[i]].rewardToken), to, amounts[i]);
+        }
+    }
+
     function safeTokenTransfer(
         IERC20 token,
         address _to,
