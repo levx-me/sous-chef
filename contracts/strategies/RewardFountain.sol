@@ -26,7 +26,6 @@ contract RewardFountain is Ownable, IMultipleRewardStrategy {
     ) {
         sousChef = _sousChef;
 
-        require(_rewardTokens.length == _rewardRatio.length, "SOUSCHEF: LENGTH_NOT_EQUAL");
         for (uint256 i = 0; i < _rewardTokens.length; i++) {
             require(_rewardTokens[i] != address(0), "SOUSCHEF: INVALID_TOKEN_ADDRESS");
             rewardTokens.push(RewardToken({rewardToken: _rewardTokens[i], rewardRatio: _rewardRatio[i]}));
@@ -39,7 +38,6 @@ contract RewardFountain is Ownable, IMultipleRewardStrategy {
         address[] calldata _rewardTokens,
         uint256[] memory _rewardRatio
     ) external onlyOwner {
-        require(ids.length == _rewardTokens.length && ids.length == _rewardRatio.length, "SOUSCHEF: LENGTH_NOT_EQUAL");
         for (uint256 i = 0; i < ids.length; i++) {
             rewardTokens[ids[i]] = RewardToken({rewardToken: _rewardTokens[i], rewardRatio: _rewardRatio[i]});
             emit SetRewardToken(ids[i], _rewardTokens[i]);
