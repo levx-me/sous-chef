@@ -258,32 +258,6 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
         (, yieldTokenAmount) = deposit(pid, amount);
     }
 
-    function withdrawWithPermit(
-        uint256 pid,
-        uint256 amount,
-        IUniswapV2ERC20 lpToken,
-        uint256 deadline,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external override returns (uint256 yieldTokenAmount) {
-        lpToken.permit(msg.sender, address(this), amount, deadline, v, r, s);
-        (, yieldTokenAmount) = withdraw(pid, amount);
-    }
-
-    function claimWithPermit(
-        uint256 pid,
-        uint256 yieldTokenAmount,
-        ISushiYieldToken yieldToken,
-        uint256 deadline,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external override returns (uint256 sushiAmount) {
-        yieldToken.permit(msg.sender, address(this), yieldTokenAmount, deadline, v, r, s);
-        return claimSushiRewardWithBurningYieldToken(pid, yieldTokenAmount);
-    }
-
     function sushiRewardPerYieldToken() public view override returns (uint256 sushiReward) {
         return sushi.balanceOf(address(sushiBar)) / sushiBar.totalSupply();
     }

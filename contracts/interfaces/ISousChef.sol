@@ -67,26 +67,6 @@ interface ISousChef {
         bytes32 s
     ) external returns (uint256 yieldTokenAmount);
 
-    function withdrawWithPermit(
-        uint256 pid,
-        uint256 amount,
-        IUniswapV2ERC20 lpToken,
-        uint256 deadline,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external returns (uint256 yieldTokenAmount);
-
-    function claimWithPermit(
-        uint256 pid,
-        uint256 yieldTokenAmount,
-        ISushiYieldToken yieldToken,
-        uint256 deadline,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external returns (uint256 sushiAmount);
-
     function sushiRewardPerYieldToken() external view returns (uint256 sushiReward);
 
     function pendingSushiRewardWithYieldToken(uint256 pid, uint256 yieldTokenAmount)
