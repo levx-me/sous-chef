@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.8;
+pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./libraries/Signature.sol";
 import "./interfaces/ISushiYieldToken.sol";
 
 contract SushiYieldToken is ERC20("SushiYieldToken", "SYD"), ISushiYieldToken {
-    address public immutable override sousChef;
-    uint256 public immutable override pid;
-    address public immutable override lpToken;
+    address public immutable sousChef;
+    uint256 public immutable pid;
+    address public immutable lpToken;
 
     bytes32 private immutable _CACHED_DOMAIN_SEPARATOR;
     uint256 private immutable _CACHED_CHAIN_ID;
@@ -18,10 +18,9 @@ contract SushiYieldToken is ERC20("SushiYieldToken", "SYD"), ISushiYieldToken {
     bytes32 private immutable _TYPE_HASH;
 
     // keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
-    bytes32 public constant override PERMIT_TYPEHASH =
-        0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
+    bytes32 public constant PERMIT_TYPEHASH = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
 
-    mapping(address => uint256) public override nonces;
+    mapping(address => uint256) public nonces;
 
     modifier onlySousChef() {
         require(msg.sender == sousChef, "SOUSCHEF: FORBIDDEN");
@@ -43,7 +42,7 @@ contract SushiYieldToken is ERC20("SushiYieldToken", "SYD"), ISushiYieldToken {
         );
     }
 
-    function DOMAIN_SEPARATOR() public view override returns (bytes32) {
+    function DOMAIN_SEPARATOR() public view returns (bytes32) {
         if (block.chainid == _CACHED_CHAIN_ID) {
             return _CACHED_DOMAIN_SEPARATOR;
         } else {
@@ -59,7 +58,7 @@ contract SushiYieldToken is ERC20("SushiYieldToken", "SYD"), ISushiYieldToken {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external override {
+    ) external {
         require(deadline >= block.timestamp, "SOUSCHEF: EXPIRED");
         require(owner != address(0), "SOUSCHEF: INVALID_ADDRESS");
         require(spender != owner, "SOUSCHEF: NOT_NECESSARY");
@@ -70,12 +69,12 @@ contract SushiYieldToken is ERC20("SushiYieldToken", "SYD"), ISushiYieldToken {
         _approve(owner, spender, value);
     }
 
-    function mint(address to, uint256 amount) external override onlySousChef {
+    function mint(address to, uint256 amount) external onlySousChef {
         _mint(to, amount);
         emit Mint(to, amount);
     }
 
-    function burn(address from, uint256 amount) external override onlySousChef {
+    function burn(address from, uint256 amount) external onlySousChef {
         _burn(from, amount);
         emit Burn(from, amount);
     }

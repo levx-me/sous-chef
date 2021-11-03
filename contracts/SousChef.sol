@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.8;
+pragma solidity =0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./libraries/TransferHelper.sol";
@@ -10,7 +10,7 @@ import "./SushiYieldToken.sol";
 contract SousChef is Ownable, MasterChefModule, ISousChef {
     using TransferHelper for address;
 
-    ISushiBar public immutable override sushiBar;
+    ISushiBar public immutable sushiBar;
 
     struct YieldTokenInfo {
         IERC20 lpToken;
@@ -25,8 +25,8 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
         uint256 xSushiRewardDebt;
     }
 
-    mapping(uint256 => YieldTokenInfo) public override yTokenInfoOf;
-    mapping(uint256 => mapping(address => UserInfo)) public override userInfo;
+    mapping(uint256 => YieldTokenInfo) public yTokenInfoOf;
+    mapping(uint256 => mapping(address => UserInfo)) public userInfo;
 
     constructor(
         IMasterChef _masterChef,
@@ -37,7 +37,7 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
         _sushi.approve(address(_sushiBar), type(uint256).max);
     }
 
-    function yieldTokenCodeHash() external pure override returns (bytes32) {
+    function yieldTokenCodeHash() external pure returns (bytes32) {
         return keccak256(type(SushiYieldToken).creationCode);
     }
 
@@ -67,7 +67,6 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
 
     function createYieldTokens(uint256[] calldata pids, IMultipleRewardStrategy[] calldata strategies)
         external
-        override
         onlyOwner
     {
         require(pids.length == strategies.length, "SOUSCHEF: LENGTH_NOT_EQUAL");
@@ -83,7 +82,7 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
         emit UpdateMultipleRewardStrategy(pid, address(_yInfo.lpToken), address(_yInfo.yieldToken), address(strategy));
     }
 
-    function deposit(uint256 pid, uint256 amount) public override returns (uint256 reward, uint256 yieldTokenReward) {
+    function deposit(uint256 pid, uint256 amount) public returns (uint256 reward, uint256 yieldTokenReward) {
         YieldTokenInfo storage _yInfo = yTokenInfoOf[pid];
         ISushiYieldToken yieldToken = _yInfo.yieldToken;
         require(address(yieldToken) != address(0), "SOUSCHEF: NOT_REGISTERED");
@@ -146,7 +145,7 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
     }
 
     //no more deposting lp & mint YT from unclaimed sushi reward -> use deposit(x,0).
-    function withdraw(uint256 pid, uint256 amount) public override returns (uint256 reward, uint256 yieldTokenReward) {
+    function withdraw(uint256 pid, uint256 amount) public returns (uint256 reward, uint256 yieldTokenReward) {
         require(amount > 0, "SOUSCHEF: AMOUNT_ZERO");
 
         YieldTokenInfo storage _yInfo = yTokenInfoOf[pid];
@@ -188,7 +187,6 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
 
     function burnYieldToken(ISushiYieldToken yieldToken, uint256 yieldTokenAmount)
         external
-        override
         returns (uint256 sushiReward)
     {
         require(yieldTokenAmount > 0, "SOUSCHEF: AMOUNT_ZERO");
@@ -205,7 +203,7 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
         sushiReward = sushi.balanceOf(address(this)) - balanceBefore;
 
         yieldToken.burn(msg.sender, yieldTokenAmount);
-        
+
         //multiple reward
         IMultipleRewardStrategy strategy = yTokenInfoOf[yieldToken.pid()].strategy;
         if (address(strategy) != address(0)) {
@@ -227,7 +225,6 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
 
     function claimSushiRewardWithBurningYieldToken(uint256 pid, uint256 yieldTokenAmount)
         public
-        override
         returns (uint256 sushiReward)
     {
         YieldTokenInfo storage _yInfo = yTokenInfoOf[pid];
@@ -251,7 +248,7 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external override returns (uint256 yieldTokenAmount) {
+    ) external returns (uint256 yieldTokenAmount) {
         lpToken.permit(msg.sender, address(this), amount, deadline, v, r, s);
         (, yieldTokenAmount) = deposit(pid, amount);
     }
@@ -263,7 +260,6 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
     function pendingSushiRewardWithYieldToken(uint256 pid, uint256 yieldTokenAmount)
         external
         view
-        override
         returns (uint256 sushiReward)
     {
         if (yieldTokenAmount == type(uint256).max)
@@ -273,7 +269,7 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
         if (yieldTokenAmount > 0) sushiReward += yieldTokenAmount * sushiRewardPerYieldToken();
     }
 
-    function pendingYieldToken(uint256 pid) external view override returns (uint256 yieldTokenAmount) {
+    function pendingYieldToken(uint256 pid) external view returns (uint256 yieldTokenAmount) {
         UserInfo storage _userInfo = userInfo[pid][msg.sender];
         uint256 totalLPAmount = masterChef.userInfo(pid, address(this)).amount;
 

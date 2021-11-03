@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.8;
+pragma solidity =0.8.9;
 
 import "../interfaces/IMasterChefModule.sol";
 
 abstract contract MasterChefModule is IMasterChefModule {
-    IERC20 public immutable override sushi;
-    IMasterChef public override masterChef;
+    IERC20 public immutable sushi;
+    IMasterChef public masterChef;
     uint256 public constant PRECISION = 1e18;
 
     struct RewardPoolInfo {
         uint256 accSushiPerShare;
         uint256 lastRewardBlock;
     }
-    mapping(uint256 => RewardPoolInfo) public override rewardPoolInfo;
+    mapping(uint256 => RewardPoolInfo) public rewardPoolInfo;
 
     constructor(IMasterChef _masterChef, IERC20 _sushi) {
         masterChef = _masterChef;
