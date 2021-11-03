@@ -39,8 +39,6 @@ interface ISousChef {
             uint256 xSushiRewardDebt
         );
 
-    function yieldTokenOf(IERC20 lpToken) external view returns (ISushiYieldToken);
-
     function yieldTokenCodeHash() external pure returns (bytes32);
 
     function createYieldTokens(uint256[] calldata pids, IMultipleRewardStrategy[] calldata strategies) external;

@@ -27,7 +27,6 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
 
     mapping(uint256 => YieldTokenInfo) public override yTokenInfoOf;
     mapping(uint256 => mapping(address => UserInfo)) public override userInfo;
-    mapping(IERC20 => ISushiYieldToken) public override yieldTokenOf;
 
     constructor(
         IMasterChef _masterChef,
@@ -60,7 +59,6 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
         _yInfo.strategy = strategy;
 
         rewardPoolInfo[pid].lastRewardBlock = block.number;
-        yieldTokenOf[lpToken] = token;
 
         lpToken.approve(address(masterChef), type(uint256).max);
 
