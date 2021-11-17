@@ -38,8 +38,9 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
     }
 
     function getYieldTokenAddress(uint256 pid) external view returns (address) {
-        address lpToken = address(masterChef.poolInfo(pid).lpToken);
-        bytes32 codeHash = keccak256(abi.encodePacked(type(SushiYieldToken).creationCode, abi.encode(pid, lpToken)));
+        bytes32 codeHash = keccak256(
+            abi.encodePacked(type(SushiYieldToken).creationCode, abi.encode(pid, masterChef.poolInfo(pid).lpToken))
+        );
         bytes32 salt = keccak256(abi.encodePacked(pid));
 
         return address(uint160(uint256(keccak256(abi.encodePacked(bytes1(0xff), address(this), salt, codeHash)))));
