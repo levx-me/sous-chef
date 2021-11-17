@@ -39,7 +39,7 @@ interface ISousChef {
             uint256 xSushiRewardDebt
         );
 
-    function yieldTokenCodeHash() external pure returns (bytes32);
+    function getYieldTokenAddress(uint256 pid) external view returns (address);
 
     function createYieldTokens(uint256[] calldata pids, IMultipleRewardStrategy[] calldata strategies) external;
 
