@@ -1,4 +1,14 @@
-import { SousChef, SushiYieldToken, TestMasterChef, TestSushiBar, TestLPToken, TestSushiToken, RewardBucket, RewardFountain, TestRewardToken } from "../typechain";
+import {
+    SousChef,
+    SushiYieldToken,
+    TestMasterChef,
+    TestSushiBar,
+    TestLPToken,
+    TestSushiToken,
+    RewardBucket,
+    RewardFountain,
+    TestRewardToken,
+} from "../typechain";
 
 import { ethers } from "hardhat";
 import { expect } from "chai";
@@ -162,9 +172,13 @@ describe("SousChef", () => {
 
         const RewardBucket = await ethers.getContractFactory("RewardBucket");
         const rBucket = (await RewardBucket.deploy(sChef.address, [rewardToken0.address], [10])) as RewardBucket;
-    
+
         const RewardFountain = await ethers.getContractFactory("RewardFountain");
-        const rFountain = (await RewardFountain.deploy(sChef.address, [rewardToken0.address, rewardToken1.address], [1, 2])) as RewardFountain;
+        const rFountain = (await RewardFountain.deploy(
+            sChef.address,
+            [rewardToken0.address, rewardToken1.address],
+            [1, 2]
+        )) as RewardFountain;
 
         await sChef.createYieldTokens([0, 1], [AddressZero, rBucket.address]);
 
@@ -172,12 +186,53 @@ describe("SousChef", () => {
         expect((await sChef.yTokenInfoOf(1)).strategy).to.be.equal(rBucket.address);
 
         await expect(sChef.updateStrategy(2, AddressZero)).to.be.revertedWith("SOUSCHEF: YIELD_TOKEN_NOT_EXISTS");
-        await expect(sChef.connect(alice).updateStrategy(0, AddressZero)).to.be.revertedWith("Ownable: caller is not the owner");
+        await expect(sChef.connect(alice).updateStrategy(0, AddressZero)).to.be.revertedWith(
+            "Ownable: caller is not the owner"
+        );
 
         await sChef.updateStrategy(0, rFountain.address);
         await sChef.updateStrategy(1, rFountain.address);
         expect((await sChef.yTokenInfoOf(0)).strategy).to.be.equal(rFountain.address);
         expect((await sChef.yTokenInfoOf(1)).strategy).to.be.equal(rFountain.address);
+    });
+
+    it.only("should be that multiple reward distribution(bucket) works properly", async () => {
+        const { alice, sChef, masterChef, sushi, lp } = await setupTest();
+
+        const TestRewardToken = await ethers.getContractFactory("TestRewardToken");
+        const rewardToken0 = (await TestRewardToken.deploy()) as TestRewardToken;
+        const rewardToken1 = (await TestRewardToken.deploy()) as TestRewardToken;
+
+        const RewardBucket = await ethers.getContractFactory("RewardBucket");
+        const rBucket = (await RewardBucket.deploy(sChef.address, [], [])) as RewardBucket;
+
+        await sChef.createYieldTokens([0], [AddressZero]);
+        const yToken = await getYieldToken(sChef, 0);
+
+        await sChef.connect(alice).deposit(0, 100);
+
+        await mineTo(101);
+        await expect(() => sChef.connect(alice).deposit(0, 0)).to.changeTokenBalance(yToken, alice, rpb);
+
+        let amount = rpb / 10;
+
+        await expect(() => sChef.connect(alice).burnYieldToken(yToken.address, amount)).to.changeTokenBalance(
+            sushi,
+            alice,
+            amount
+        );
+        expect(await rewardToken0.balanceOf(alice.address)).to.be.equal(0);
+        expect(await rewardToken1.balanceOf(alice.address)).to.be.equal(0);
+
+        await rewardToken0.mint(rBucket.address, amount);
+        await rBucket.setRewardTokens([0], [rewardToken0.address], [5]);
+        await expect(() => sChef.connect(alice).burnYieldToken(yToken.address, amount / 10)).to.changeTokenBalance(
+            sushi,
+            alice,
+            amount / 2
+        );
+
+
     });
 
     it("overall test-1", async () => {
