@@ -21,6 +21,7 @@ contract RewardBucket is Ownable, IMultipleRewardStrategy {
         address[] memory _rewardTokens,
         uint256[] memory _rewardRatio
     ) {
+        require(_rewardTokens.length == _rewardRatio.length, "SOUSCHEF: LENGTH_NOT_EQUAL");
         sousChef = _sousChef;
 
         for (uint256 i = 0; i < _rewardTokens.length; i++) {
@@ -30,11 +31,24 @@ contract RewardBucket is Ownable, IMultipleRewardStrategy {
         }
     }
 
+    function addRewardTokens(address[] calldata _rewardTokens, uint256[] memory _rewardRatio) external onlyOwner {
+        require(_rewardTokens.length == _rewardRatio.length, "SOUSCHEF: LENGTH_NOT_EQUAL");
+        uint256 length = rewardTokens.length;
+        for (uint256 i = 0; i < _rewardTokens.length; i++) {
+            rewardTokens.push(RewardToken({rewardToken: _rewardTokens[i], rewardRatio: _rewardRatio[i]}));
+            emit SetRewardToken(length + i, _rewardTokens[i]);
+        }
+    }
+
     function setRewardTokens(
         uint256[] calldata ids,
         address[] calldata _rewardTokens,
         uint256[] memory _rewardRatio
     ) external onlyOwner {
+        require(
+            ids.length == _rewardTokens.length && _rewardTokens.length == _rewardRatio.length,
+            "SOUSCHEF: LENGTH_NOT_EQUAL"
+        );
         for (uint256 i = 0; i < ids.length; i++) {
             rewardTokens[ids[i]] = RewardToken({rewardToken: _rewardTokens[i], rewardRatio: _rewardRatio[i]});
             emit SetRewardToken(ids[i], _rewardTokens[i]);
@@ -58,7 +72,11 @@ contract RewardBucket is Ownable, IMultipleRewardStrategy {
         }
     }
 
-    function withdrawRewardTokens(address to, uint256[] calldata ids, uint256[] calldata amounts) external onlyOwner {
+    function withdrawRewardTokens(
+        address to,
+        uint256[] calldata ids,
+        uint256[] calldata amounts
+    ) external onlyOwner {
         for (uint256 i = 0; i < ids.length; i++) {
             safeTokenTransfer(IERC20(rewardTokens[ids[i]].rewardToken), to, amounts[i]);
         }
