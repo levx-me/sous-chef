@@ -21,6 +21,7 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface RewardFountainInterface extends ethers.utils.Interface {
   functions: {
+    "addRewardTokens(address[],uint256[])": FunctionFragment;
     "claimReward(address,uint256)": FunctionFragment;
     "owner()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
@@ -30,6 +31,10 @@ interface RewardFountainInterface extends ethers.utils.Interface {
     "transferOwnership(address)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "addRewardTokens",
+    values: [string[], BigNumberish[]]
+  ): string;
   encodeFunctionData(
     functionFragment: "claimReward",
     values: [string, BigNumberish]
@@ -53,6 +58,10 @@ interface RewardFountainInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "addRewardTokens",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "claimReward",
     data: BytesLike
@@ -137,6 +146,12 @@ export class RewardFountain extends BaseContract {
   interface: RewardFountainInterface;
 
   functions: {
+    addRewardTokens(
+      _rewardTokens: string[],
+      _rewardRatio: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     claimReward(
       user: string,
       yieldTokenAmount: BigNumberish,
@@ -170,6 +185,12 @@ export class RewardFountain extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
+
+  addRewardTokens(
+    _rewardTokens: string[],
+    _rewardRatio: BigNumberish[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   claimReward(
     user: string,
@@ -205,6 +226,12 @@ export class RewardFountain extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    addRewardTokens(
+      _rewardTokens: string[],
+      _rewardRatio: BigNumberish[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     claimReward(
       user: string,
       yieldTokenAmount: BigNumberish,
@@ -272,6 +299,12 @@ export class RewardFountain extends BaseContract {
   };
 
   estimateGas: {
+    addRewardTokens(
+      _rewardTokens: string[],
+      _rewardRatio: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     claimReward(
       user: string,
       yieldTokenAmount: BigNumberish,
@@ -305,6 +338,12 @@ export class RewardFountain extends BaseContract {
   };
 
   populateTransaction: {
+    addRewardTokens(
+      _rewardTokens: string[],
+      _rewardRatio: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     claimReward(
       user: string,
       yieldTokenAmount: BigNumberish,

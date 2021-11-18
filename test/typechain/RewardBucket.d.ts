@@ -21,6 +21,7 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface RewardBucketInterface extends ethers.utils.Interface {
   functions: {
+    "addRewardTokens(address[],uint256[])": FunctionFragment;
     "claimReward(address,uint256)": FunctionFragment;
     "owner()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
@@ -28,8 +29,13 @@ interface RewardBucketInterface extends ethers.utils.Interface {
     "setRewardTokens(uint256[],address[],uint256[])": FunctionFragment;
     "sousChef()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
+    "withdrawRewardTokens(address,uint256[],uint256[])": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "addRewardTokens",
+    values: [string[], BigNumberish[]]
+  ): string;
   encodeFunctionData(
     functionFragment: "claimReward",
     values: [string, BigNumberish]
@@ -52,7 +58,15 @@ interface RewardBucketInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     values: [string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "withdrawRewardTokens",
+    values: [string, BigNumberish[], BigNumberish[]]
+  ): string;
 
+  decodeFunctionResult(
+    functionFragment: "addRewardTokens",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "claimReward",
     data: BytesLike
@@ -73,6 +87,10 @@ interface RewardBucketInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "sousChef", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawRewardTokens",
     data: BytesLike
   ): Result;
 
@@ -137,6 +155,12 @@ export class RewardBucket extends BaseContract {
   interface: RewardBucketInterface;
 
   functions: {
+    addRewardTokens(
+      _rewardTokens: string[],
+      _rewardRatio: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     claimReward(
       user: string,
       yieldTokenAmount: BigNumberish,
@@ -169,7 +193,20 @@ export class RewardBucket extends BaseContract {
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    withdrawRewardTokens(
+      to: string,
+      ids: BigNumberish[],
+      amounts: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
+
+  addRewardTokens(
+    _rewardTokens: string[],
+    _rewardRatio: BigNumberish[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   claimReward(
     user: string,
@@ -204,7 +241,20 @@ export class RewardBucket extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  withdrawRewardTokens(
+    to: string,
+    ids: BigNumberish[],
+    amounts: BigNumberish[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
+    addRewardTokens(
+      _rewardTokens: string[],
+      _rewardRatio: BigNumberish[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     claimReward(
       user: string,
       yieldTokenAmount: BigNumberish,
@@ -233,6 +283,13 @@ export class RewardBucket extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    withdrawRewardTokens(
+      to: string,
+      ids: BigNumberish[],
+      amounts: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -272,6 +329,12 @@ export class RewardBucket extends BaseContract {
   };
 
   estimateGas: {
+    addRewardTokens(
+      _rewardTokens: string[],
+      _rewardRatio: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     claimReward(
       user: string,
       yieldTokenAmount: BigNumberish,
@@ -302,9 +365,22 @@ export class RewardBucket extends BaseContract {
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    withdrawRewardTokens(
+      to: string,
+      ids: BigNumberish[],
+      amounts: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    addRewardTokens(
+      _rewardTokens: string[],
+      _rewardRatio: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     claimReward(
       user: string,
       yieldTokenAmount: BigNumberish,
@@ -333,6 +409,13 @@ export class RewardBucket extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    withdrawRewardTokens(
+      to: string,
+      ids: BigNumberish[],
+      amounts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

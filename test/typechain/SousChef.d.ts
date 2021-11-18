@@ -24,10 +24,10 @@ interface SousChefInterface extends ethers.utils.Interface {
     "PRECISION()": FunctionFragment;
     "burnYieldToken(address,uint256)": FunctionFragment;
     "claimSushiRewardWithBurningYieldToken(uint256,uint256)": FunctionFragment;
-    "claimWithPermit(uint256,uint256,address,uint256,uint8,bytes32,bytes32)": FunctionFragment;
     "createYieldTokens(uint256[],address[])": FunctionFragment;
     "deposit(uint256,uint256)": FunctionFragment;
     "depositWithPermit(uint256,uint256,address,uint256,uint8,bytes32,bytes32)": FunctionFragment;
+    "getYieldTokenAddress(uint256)": FunctionFragment;
     "masterChef()": FunctionFragment;
     "owner()": FunctionFragment;
     "pendingSushiRewardWithYieldToken(uint256,uint256)": FunctionFragment;
@@ -41,10 +41,7 @@ interface SousChefInterface extends ethers.utils.Interface {
     "updateStrategy(uint256,address)": FunctionFragment;
     "userInfo(uint256,address)": FunctionFragment;
     "withdraw(uint256,uint256)": FunctionFragment;
-    "withdrawWithPermit(uint256,uint256,address,uint256,uint8,bytes32,bytes32)": FunctionFragment;
     "yTokenInfoOf(uint256)": FunctionFragment;
-    "yieldTokenCodeHash()": FunctionFragment;
-    "yieldTokenOf(address)": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "PRECISION", values?: undefined): string;
@@ -55,18 +52,6 @@ interface SousChefInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "claimSushiRewardWithBurningYieldToken",
     values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "claimWithPermit",
-    values: [
-      BigNumberish,
-      BigNumberish,
-      string,
-      BigNumberish,
-      BigNumberish,
-      BytesLike,
-      BytesLike
-    ]
   ): string;
   encodeFunctionData(
     functionFragment: "createYieldTokens",
@@ -87,6 +72,10 @@ interface SousChefInterface extends ethers.utils.Interface {
       BytesLike,
       BytesLike
     ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getYieldTokenAddress",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "masterChef",
@@ -132,28 +121,8 @@ interface SousChefInterface extends ethers.utils.Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "withdrawWithPermit",
-    values: [
-      BigNumberish,
-      BigNumberish,
-      string,
-      BigNumberish,
-      BigNumberish,
-      BytesLike,
-      BytesLike
-    ]
-  ): string;
-  encodeFunctionData(
     functionFragment: "yTokenInfoOf",
     values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "yieldTokenCodeHash",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "yieldTokenOf",
-    values: [string]
   ): string;
 
   decodeFunctionResult(functionFragment: "PRECISION", data: BytesLike): Result;
@@ -166,16 +135,16 @@ interface SousChefInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "claimWithPermit",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "createYieldTokens",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "depositWithPermit",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getYieldTokenAddress",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "masterChef", data: BytesLike): Result;
@@ -213,19 +182,7 @@ interface SousChefInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "userInfo", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "withdrawWithPermit",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "yTokenInfoOf",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "yieldTokenCodeHash",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "yieldTokenOf",
     data: BytesLike
   ): Result;
 
@@ -352,17 +309,6 @@ export class SousChef extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    claimWithPermit(
-      pid: BigNumberish,
-      yieldTokenAmount: BigNumberish,
-      yieldToken: string,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     createYieldTokens(
       pids: BigNumberish[],
       strategies: string[],
@@ -385,6 +331,11 @@ export class SousChef extends BaseContract {
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    getYieldTokenAddress(
+      pid: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
 
     masterChef(overrides?: CallOverrides): Promise<[string]>;
 
@@ -452,17 +403,6 @@ export class SousChef extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    withdrawWithPermit(
-      pid: BigNumberish,
-      amount: BigNumberish,
-      lpToken: string,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     yTokenInfoOf(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -474,10 +414,6 @@ export class SousChef extends BaseContract {
         accXSushiPerShare: BigNumber;
       }
     >;
-
-    yieldTokenCodeHash(overrides?: CallOverrides): Promise<[string]>;
-
-    yieldTokenOf(arg0: string, overrides?: CallOverrides): Promise<[string]>;
   };
 
   PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
@@ -491,17 +427,6 @@ export class SousChef extends BaseContract {
   claimSushiRewardWithBurningYieldToken(
     pid: BigNumberish,
     yieldTokenAmount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  claimWithPermit(
-    pid: BigNumberish,
-    yieldTokenAmount: BigNumberish,
-    yieldToken: string,
-    deadline: BigNumberish,
-    v: BigNumberish,
-    r: BytesLike,
-    s: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -527,6 +452,11 @@ export class SousChef extends BaseContract {
     s: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  getYieldTokenAddress(
+    pid: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   masterChef(overrides?: CallOverrides): Promise<string>;
 
@@ -592,17 +522,6 @@ export class SousChef extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  withdrawWithPermit(
-    pid: BigNumberish,
-    amount: BigNumberish,
-    lpToken: string,
-    deadline: BigNumberish,
-    v: BigNumberish,
-    r: BytesLike,
-    s: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   yTokenInfoOf(
     arg0: BigNumberish,
     overrides?: CallOverrides
@@ -614,10 +533,6 @@ export class SousChef extends BaseContract {
       accXSushiPerShare: BigNumber;
     }
   >;
-
-  yieldTokenCodeHash(overrides?: CallOverrides): Promise<string>;
-
-  yieldTokenOf(arg0: string, overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
     PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
@@ -631,17 +546,6 @@ export class SousChef extends BaseContract {
     claimSushiRewardWithBurningYieldToken(
       pid: BigNumberish,
       yieldTokenAmount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    claimWithPermit(
-      pid: BigNumberish,
-      yieldTokenAmount: BigNumberish,
-      yieldToken: string,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -672,6 +576,11 @@ export class SousChef extends BaseContract {
       s: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    getYieldTokenAddress(
+      pid: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     masterChef(overrides?: CallOverrides): Promise<string>;
 
@@ -740,17 +649,6 @@ export class SousChef extends BaseContract {
       }
     >;
 
-    withdrawWithPermit(
-      pid: BigNumberish,
-      amount: BigNumberish,
-      lpToken: string,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     yTokenInfoOf(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -762,10 +660,6 @@ export class SousChef extends BaseContract {
         accXSushiPerShare: BigNumber;
       }
     >;
-
-    yieldTokenCodeHash(overrides?: CallOverrides): Promise<string>;
-
-    yieldTokenOf(arg0: string, overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
@@ -895,17 +789,6 @@ export class SousChef extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    claimWithPermit(
-      pid: BigNumberish,
-      yieldTokenAmount: BigNumberish,
-      yieldToken: string,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     createYieldTokens(
       pids: BigNumberish[],
       strategies: string[],
@@ -927,6 +810,11 @@ export class SousChef extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    getYieldTokenAddress(
+      pid: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     masterChef(overrides?: CallOverrides): Promise<BigNumber>;
@@ -982,25 +870,10 @@ export class SousChef extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    withdrawWithPermit(
-      pid: BigNumberish,
-      amount: BigNumberish,
-      lpToken: string,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     yTokenInfoOf(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    yieldTokenCodeHash(overrides?: CallOverrides): Promise<BigNumber>;
-
-    yieldTokenOf(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -1015,17 +888,6 @@ export class SousChef extends BaseContract {
     claimSushiRewardWithBurningYieldToken(
       pid: BigNumberish,
       yieldTokenAmount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    claimWithPermit(
-      pid: BigNumberish,
-      yieldTokenAmount: BigNumberish,
-      yieldToken: string,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1050,6 +912,11 @@ export class SousChef extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    getYieldTokenAddress(
+      pid: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     masterChef(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1107,28 +974,8 @@ export class SousChef extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    withdrawWithPermit(
-      pid: BigNumberish,
-      amount: BigNumberish,
-      lpToken: string,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     yTokenInfoOf(
       arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    yieldTokenCodeHash(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    yieldTokenOf(
-      arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };

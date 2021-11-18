@@ -195,55 +195,6 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "pid",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "yieldTokenAmount",
-        type: "uint256",
-      },
-      {
-        internalType: "contract ISushiYieldToken",
-        name: "yieldToken",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "deadline",
-        type: "uint256",
-      },
-      {
-        internalType: "uint8",
-        name: "v",
-        type: "uint8",
-      },
-      {
-        internalType: "bytes32",
-        name: "r",
-        type: "bytes32",
-      },
-      {
-        internalType: "bytes32",
-        name: "s",
-        type: "bytes32",
-      },
-    ],
-    name: "claimWithPermit",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "sushiAmount",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
         internalType: "uint256[]",
         name: "pids",
         type: "uint256[]",
@@ -335,6 +286,25 @@ const _abi = [
       },
     ],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "pid",
+        type: "uint256",
+      },
+    ],
+    name: "getYieldTokenAddress",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -476,55 +446,6 @@ const _abi = [
         name: "pid",
         type: "uint256",
       },
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-      {
-        internalType: "contract IUniswapV2ERC20",
-        name: "lpToken",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "deadline",
-        type: "uint256",
-      },
-      {
-        internalType: "uint8",
-        name: "v",
-        type: "uint8",
-      },
-      {
-        internalType: "bytes32",
-        name: "r",
-        type: "bytes32",
-      },
-      {
-        internalType: "bytes32",
-        name: "s",
-        type: "bytes32",
-      },
-    ],
-    name: "withdrawWithPermit",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "yieldTokenAmount",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "pid",
-        type: "uint256",
-      },
     ],
     name: "yTokenInfoOf",
     outputs: [
@@ -547,38 +468,6 @@ const _abi = [
         internalType: "uint256",
         name: "accXSushiPerShare",
         type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "yieldTokenCodeHash",
-    outputs: [
-      {
-        internalType: "bytes32",
-        name: "",
-        type: "bytes32",
-      },
-    ],
-    stateMutability: "pure",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "contract IERC20",
-        name: "lpToken",
-        type: "address",
-      },
-    ],
-    name: "yieldTokenOf",
-    outputs: [
-      {
-        internalType: "contract ISushiYieldToken",
-        name: "",
-        type: "address",
       },
     ],
     stateMutability: "view",

@@ -24,6 +24,8 @@ export type { SushiYieldToken } from "./SushiYieldToken";
 export type { TestLPToken } from "./TestLPToken";
 export type { IMigratorChef } from "./IMigratorChef";
 export type { TestMasterChef } from "./TestMasterChef";
+export type { TestRewardToken } from "./TestRewardToken";
+export type { TestRewardTokenMintable } from "./TestRewardTokenMintable";
 export type { TestSushiBar } from "./TestSushiBar";
 export type { TestSushiToken } from "./TestSushiToken";
 
@@ -50,5 +52,7 @@ export { SushiYieldToken__factory } from "./factories/SushiYieldToken__factory";
 export { TestLPToken__factory } from "./factories/TestLPToken__factory";
 export { IMigratorChef__factory } from "./factories/IMigratorChef__factory";
 export { TestMasterChef__factory } from "./factories/TestMasterChef__factory";
+export { TestRewardToken__factory } from "./factories/TestRewardToken__factory";
+export { TestRewardTokenMintable__factory } from "./factories/TestRewardTokenMintable__factory";
 export { TestSushiBar__factory } from "./factories/TestSushiBar__factory";
 export { TestSushiToken__factory } from "./factories/TestSushiToken__factory";

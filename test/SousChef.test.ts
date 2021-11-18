@@ -8,6 +8,7 @@ import {
     RewardBucket,
     RewardFountain,
     TestRewardToken,
+    TestRewardTokenMintable,
 } from "../typechain";
 
 import { ethers } from "hardhat";
@@ -196,8 +197,8 @@ describe("SousChef", () => {
         expect((await sChef.yTokenInfoOf(1)).strategy).to.be.equal(rFountain.address);
     });
 
-    it.only("should be that multiple reward distribution(bucket) works properly", async () => {
-        const { alice, sChef, masterChef, sushi, lp } = await setupTest();
+    it("should be that multiple reward distribution(bucket) works properly", async () => {
+        const { alice, bob, sChef, sushi } = await setupTest();
 
         const TestRewardToken = await ethers.getContractFactory("TestRewardToken");
         const rewardToken0 = (await TestRewardToken.deploy()) as TestRewardToken;
@@ -205,6 +206,7 @@ describe("SousChef", () => {
 
         const RewardBucket = await ethers.getContractFactory("RewardBucket");
         const rBucket = (await RewardBucket.deploy(sChef.address, [], [])) as RewardBucket;
+        expect(await rBucket.sousChef()).to.be.equal(sChef.address);
 
         await sChef.createYieldTokens([0], [AddressZero]);
         const yToken = await getYieldToken(sChef, 0);
@@ -225,14 +227,190 @@ describe("SousChef", () => {
         expect(await rewardToken1.balanceOf(alice.address)).to.be.equal(0);
 
         await rewardToken0.mint(rBucket.address, amount);
-        await rBucket.setRewardTokens([0], [rewardToken0.address], [5]);
+        await rBucket.addRewardTokens([rewardToken0.address], [5]);
+        await sChef.updateStrategy(0, rBucket.address);
+
+        expect((await rBucket.rewardTokens(0)).rewardToken).to.be.equal(rewardToken0.address);
+        expect((await rBucket.rewardTokens(0)).rewardRatio).to.be.equal(5);
+
         await expect(() => sChef.connect(alice).burnYieldToken(yToken.address, amount / 10)).to.changeTokenBalance(
-            sushi,
+            rewardToken0,
+            alice,
+            amount / 2
+        );
+        await expect(() => sChef.connect(alice).burnYieldToken(yToken.address, amount)).to.changeTokenBalance(
+            rewardToken0,
             alice,
             amount / 2
         );
 
+        expect(await rewardToken0.balanceOf(alice.address)).to.be.equal(amount);
 
+        await expect(rBucket.setRewardTokens([0, 1], [rewardToken0.address, rewardToken1.address], [5, 10])).to.be
+            .reverted;
+        await rBucket.setRewardTokens([0], [rewardToken1.address], [7]);
+
+        await rewardToken1.mint(rBucket.address, (amount * 9) / 10);
+        await expect(() => sChef.connect(alice).burnYieldToken(yToken.address, amount / 10)).to.changeTokenBalance(
+            rewardToken1,
+            alice,
+            (amount * 7) / 10
+        );
+        await expect(() => sChef.connect(alice).burnYieldToken(yToken.address, amount / 10)).to.changeTokenBalance(
+            rewardToken1,
+            alice,
+            (amount * 2) / 10
+        );
+
+        expect(await rewardToken0.balanceOf(alice.address)).to.be.equal(amount);
+        expect(await rewardToken1.balanceOf(alice.address)).to.be.equal((amount * 9) / 10);
+
+        await rBucket.addRewardTokens([rewardToken0.address], [3]);
+        await rewardToken0.mint(rBucket.address, amount);
+        await rewardToken1.mint(rBucket.address, amount);
+
+        let r0Bal = await rewardToken0.balanceOf(alice.address);
+        let r1Bal = await rewardToken1.balanceOf(alice.address);
+
+        await sChef.connect(alice).burnYieldToken(yToken.address, amount / 20);
+        expect(await rewardToken0.balanceOf(alice.address)).to.be.equal(r0Bal.add((amount * 3) / 20));
+        expect(await rewardToken1.balanceOf(alice.address)).to.be.equal(r1Bal.add((amount * 7) / 20));
+
+        r0Bal = await rewardToken0.balanceOf(alice.address);
+        r1Bal = await rewardToken1.balanceOf(alice.address);
+
+        await expect(() => rBucket.withdrawRewardTokens(bob.address, [1], [amount])).to.changeTokenBalance(
+            rewardToken0,
+            bob,
+            (amount * 17) / 20
+        );
+
+        await sChef.connect(alice).burnYieldToken(yToken.address, amount / 20);
+        expect(await rewardToken0.balanceOf(alice.address)).to.be.equal(r0Bal);
+        expect(await rewardToken1.balanceOf(alice.address)).to.be.equal(r1Bal.add((amount * 7) / 20));
+
+        r1Bal = await rewardToken1.balanceOf(alice.address);
+
+        await rewardToken0.mint(rBucket.address, amount);
+        await rewardToken1.mint(rBucket.address, amount);
+        await rBucket.setRewardTokens([1], [AddressZero], [0]);
+        await rBucket.addRewardTokens([rewardToken0.address], [2]);
+
+        await sChef.connect(alice).burnYieldToken(yToken.address, amount / 20);
+        expect(await rewardToken0.balanceOf(alice.address)).to.be.equal(r0Bal.add(amount / 10));
+        expect(await rewardToken1.balanceOf(alice.address)).to.be.equal(r1Bal.add((amount * 7) / 20));
+    });
+
+    it("should be that multiple reward distribution(fountain) works properly", async () => {
+        const { alice, bob, sChef, sushi } = await setupTest();
+
+        const TestRewardTokenMintable = await ethers.getContractFactory("TestRewardTokenMintable");
+        const rewardToken0 = (await TestRewardTokenMintable.deploy()) as TestRewardTokenMintable;
+        const rewardToken1 = (await TestRewardTokenMintable.deploy()) as TestRewardTokenMintable;
+
+        const RewardFountain = await ethers.getContractFactory("RewardFountain");
+        const rFountain = (await RewardFountain.deploy(sChef.address, [], [])) as RewardFountain;
+        expect(await rFountain.sousChef()).to.be.equal(sChef.address);
+
+        await sChef.createYieldTokens([0], [AddressZero]);
+        const yToken = await getYieldToken(sChef, 0);
+
+        await sChef.connect(alice).deposit(0, 100);
+
+        await mineTo(101);
+        await expect(() => sChef.connect(alice).deposit(0, 0)).to.changeTokenBalance(yToken, alice, rpb);
+
+        let amount = rpb / 10;
+
+        await expect(() => sChef.connect(alice).burnYieldToken(yToken.address, amount)).to.changeTokenBalance(
+            sushi,
+            alice,
+            amount
+        );
+        expect(await rewardToken0.balanceOf(alice.address)).to.be.equal(0);
+        expect(await rewardToken1.balanceOf(alice.address)).to.be.equal(0);
+
+        await rFountain.addRewardTokens([rewardToken0.address], [5]);
+        await sChef.updateStrategy(0, rFountain.address);
+
+        expect((await rFountain.rewardTokens(0)).rewardToken).to.be.equal(rewardToken0.address);
+        expect((await rFountain.rewardTokens(0)).rewardRatio).to.be.equal(5);
+
+        await expect(() => sChef.connect(alice).burnYieldToken(yToken.address, amount / 20)).to.changeTokenBalance(
+            rewardToken0,
+            alice,
+            0
+        );
+
+        await rewardToken0.setMinter(rFountain.address, true);
+        await expect(() => sChef.connect(alice).burnYieldToken(yToken.address, amount / 20)).to.changeTokenBalance(
+            rewardToken0,
+            alice,
+            amount / 4
+        );
+
+        await expect(() => sChef.connect(alice).burnYieldToken(yToken.address, amount)).to.changeTokenBalance(
+            rewardToken0,
+            alice,
+            amount * 5
+        );
+
+        let r0Bal = await rewardToken0.balanceOf(alice.address);
+        expect(r0Bal).to.be.equal(amount * 5 + amount / 4);
+
+        await expect(rFountain.setRewardTokens([0, 1], [rewardToken0.address, rewardToken1.address], [5, 10])).to.be
+            .reverted;
+        await rFountain.setRewardTokens([0], [rewardToken1.address], [7]); //0-r1-7
+        await rewardToken1.setMinter(rFountain.address, true);
+
+        await expect(() => sChef.connect(alice).burnYieldToken(yToken.address, amount / 10)).to.changeTokenBalance(
+            rewardToken1,
+            alice,
+            (amount * 7) / 10
+        );
+        await expect(() => sChef.connect(alice).burnYieldToken(yToken.address, amount / 10)).to.changeTokenBalance(
+            rewardToken1,
+            alice,
+            (amount * 7) / 10
+        );
+
+        expect(await rewardToken0.balanceOf(alice.address)).to.be.equal(r0Bal);
+        expect(await rewardToken1.balanceOf(alice.address)).to.be.equal((amount * 14) / 10);
+
+        await rFountain.addRewardTokens([rewardToken0.address], [3]); //1-r0-3
+
+        r0Bal = await rewardToken0.balanceOf(alice.address);
+        let r1Bal = await rewardToken1.balanceOf(alice.address);
+
+        await sChef.connect(alice).burnYieldToken(yToken.address, amount / 20);
+        expect(await rewardToken0.balanceOf(alice.address)).to.be.equal(r0Bal.add((amount * 3) / 20));
+        expect(await rewardToken1.balanceOf(alice.address)).to.be.equal(r1Bal.add((amount * 7) / 20));
+
+        r0Bal = await rewardToken0.balanceOf(alice.address);
+        r1Bal = await rewardToken1.balanceOf(alice.address);
+
+        await rewardToken0.setMinter(rFountain.address, false);
+
+        await expect(() => sChef.connect(alice).burnYieldToken(yToken.address, amount / 20)).to.changeTokenBalance(
+            sushi,
+            alice,
+            amount / 20
+        );
+        expect(await rewardToken0.balanceOf(alice.address)).to.be.equal(r0Bal);
+        expect(await rewardToken1.balanceOf(alice.address)).to.be.equal(r1Bal.add((amount * 7) / 20));
+
+        await rFountain.setRewardTokens([1], [AddressZero], [0]);
+
+        await rewardToken0.setMinter(rFountain.address, true);
+
+        await rFountain.setRewardTokens([1], [AddressZero], [0]);
+        await rFountain.addRewardTokens([rewardToken0.address], [2]);
+
+        r1Bal = await rewardToken1.balanceOf(alice.address);
+
+        await sChef.connect(alice).burnYieldToken(yToken.address, amount / 20);
+        expect(await rewardToken0.balanceOf(alice.address)).to.be.equal(r0Bal.add(amount / 10));
+        expect(await rewardToken1.balanceOf(alice.address)).to.be.equal(r1Bal.add((amount * 7) / 20));
     });
 
     it("overall test-1", async () => {
