@@ -66,7 +66,7 @@ contract RewardFountain is Ownable, IMultipleRewardStrategy {
             for (uint256 i = 0; i < length; i++) {
                 RewardToken memory _rToken = rewardTokens[i];
                 if (_rToken.rewardToken != address(0) && _rToken.rewardRatio != 0) {
-                    IERC20Mintable(_rToken.rewardToken).mint(user, yieldTokenAmount * _rToken.rewardRatio);
+                    try IERC20Mintable(_rToken.rewardToken).mint(user, yieldTokenAmount * _rToken.rewardRatio) {} catch {}
                 }
             }
         }
