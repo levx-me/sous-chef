@@ -319,6 +319,11 @@ const _abi = [
         name: "yieldTokenAmount",
         type: "uint256",
       },
+      {
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
     ],
     name: "pendingSushiRewardWithYieldToken",
     outputs: [
@@ -337,6 +342,11 @@ const _abi = [
         internalType: "uint256",
         name: "pid",
         type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "user",
+        type: "address",
       },
     ],
     name: "pendingYieldToken",

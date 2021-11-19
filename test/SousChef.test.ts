@@ -413,6 +413,47 @@ describe("SousChef", () => {
         expect(await rewardToken1.balanceOf(alice.address)).to.be.equal(r1Bal.add((amount * 7) / 20));
     });
 
+    it.only("should be that pendingYieldToken function shows correct value", async () => {
+        const { alice, bob, sChef, sushi, masterChef, sushiBar } = await setupTest();
+
+        const rewardToken0 = (await (
+            await ethers.getContractFactory("TestRewardTokenMintable")
+        ).deploy()) as TestRewardTokenMintable;
+
+        const rFountain = (await (
+            await ethers.getContractFactory("RewardFountain")
+        ).deploy(sChef.address, [rewardToken0.address], [5])) as RewardFountain;
+
+        const lp1 = (await (await ethers.getContractFactory("TestLPToken")).deploy()) as TestLPToken;
+
+        await masterChef.add(100, lp1.address, true);
+        await sChef.createYieldTokens([0], [rFountain.address]);
+        const yToken = await getYieldToken(sChef, 0);
+
+        await sChef.connect(alice).deposit(0, 100);
+        await sushiBar.enter(1);
+
+        await mineTo(101);
+        expect(await sChef.pendingYieldToken(0, alice.address)).to.be.equal(0);
+
+        await sChef.connect(alice).deposit(0, 0);
+        await mine(11);
+        expect(await sChef.pendingYieldToken(0, alice.address)).to.be.equal((rpb / 2) * 11);
+
+        await masterChef.add(200, lp1.address, true);
+        await sushi.transfer(sushiBar.address, await sushi.balanceOf(sushiBar.address));
+        expect(await sChef.pendingYieldToken(0, alice.address)).to.be.equal(((rpb / 2) * 12 + (rpb / 4) * 1) / 2);
+
+        await sChef.connect(bob).deposit(0, 100);
+        await sushi.transfer(sushiBar.address, await sushi.balanceOf(sushiBar.address));
+        expect(await sChef.pendingYieldToken(0, alice.address)).to.be.equal(
+            Math.floor(((rpb / 2) * 12 + (rpb / 4) * 2) / 2 + ((rpb / 4 / 2) * 1) / 2 / 2)
+        );
+        expect(await sChef.pendingYieldToken(0, bob.address)).to.be.equal(
+            Math.floor(((rpb / 4 / 2) * 1) / 2 / 2)
+        );
+    });
+
     it("overall test-1", async () => {
         const { deployer, alice, bob, carol, sChef, masterChef, sushiBar, sushi, lp } = await setupTest();
 

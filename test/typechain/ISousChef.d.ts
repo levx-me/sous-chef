@@ -27,8 +27,8 @@ interface ISousChefInterface extends ethers.utils.Interface {
     "deposit(uint256,uint256)": FunctionFragment;
     "depositWithPermit(uint256,uint256,address,uint256,uint8,bytes32,bytes32)": FunctionFragment;
     "getYieldTokenAddress(uint256)": FunctionFragment;
-    "pendingSushiRewardWithYieldToken(uint256,uint256)": FunctionFragment;
-    "pendingYieldToken(uint256)": FunctionFragment;
+    "pendingSushiRewardWithYieldToken(uint256,uint256,address)": FunctionFragment;
+    "pendingYieldToken(uint256,address)": FunctionFragment;
     "sushiBar()": FunctionFragment;
     "sushiRewardPerYieldToken()": FunctionFragment;
     "userInfo(uint256,address)": FunctionFragment;
@@ -70,11 +70,11 @@ interface ISousChefInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "pendingSushiRewardWithYieldToken",
-    values: [BigNumberish, BigNumberish]
+    values: [BigNumberish, BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "pendingYieldToken",
-    values: [BigNumberish]
+    values: [BigNumberish, string]
   ): string;
   encodeFunctionData(functionFragment: "sushiBar", values?: undefined): string;
   encodeFunctionData(
@@ -281,11 +281,13 @@ export class ISousChef extends BaseContract {
     pendingSushiRewardWithYieldToken(
       pid: BigNumberish,
       yieldTokenAmount: BigNumberish,
+      user: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { sushiReward: BigNumber }>;
 
     pendingYieldToken(
       pid: BigNumberish,
+      user: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { yieldTokenAmount: BigNumber }>;
 
@@ -369,11 +371,13 @@ export class ISousChef extends BaseContract {
   pendingSushiRewardWithYieldToken(
     pid: BigNumberish,
     yieldTokenAmount: BigNumberish,
+    user: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   pendingYieldToken(
     pid: BigNumberish,
+    user: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -460,11 +464,13 @@ export class ISousChef extends BaseContract {
     pendingSushiRewardWithYieldToken(
       pid: BigNumberish,
       yieldTokenAmount: BigNumberish,
+      user: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     pendingYieldToken(
       pid: BigNumberish,
+      user: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -648,11 +654,13 @@ export class ISousChef extends BaseContract {
     pendingSushiRewardWithYieldToken(
       pid: BigNumberish,
       yieldTokenAmount: BigNumberish,
+      user: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     pendingYieldToken(
       pid: BigNumberish,
+      user: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -722,11 +730,13 @@ export class ISousChef extends BaseContract {
     pendingSushiRewardWithYieldToken(
       pid: BigNumberish,
       yieldTokenAmount: BigNumberish,
+      user: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     pendingYieldToken(
       pid: BigNumberish,
+      user: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
