@@ -67,10 +67,10 @@ interface ISousChef {
 
     function sushiRewardPerYieldToken() external view returns (uint256 sushiReward);
 
-    function pendingSushiRewardWithYieldToken(uint256 pid, uint256 yieldTokenAmount)
+    function pendingSushiRewardWithYieldToken(uint256 pid, uint256 yieldTokenAmount, address user)
         external
         view
         returns (uint256 sushiReward);
 
-    function pendingYieldToken(uint256 pid) external view returns (uint256 yieldTokenAmount);
+    function pendingYieldToken(uint256 pid, address user) external view returns (uint256 yieldTokenAmount);
 }

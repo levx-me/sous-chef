@@ -262,20 +262,20 @@ contract SousChef is Ownable, MasterChefModule, ISousChef {
         return sushi.balanceOf(address(sushiBar)) / sushiBar.totalSupply();
     }
 
-    function pendingSushiRewardWithYieldToken(uint256 pid, uint256 yieldTokenAmount)
+    function pendingSushiRewardWithYieldToken(uint256 pid, uint256 yieldTokenAmount, address user)
         external
         view
         returns (uint256 sushiReward)
     {
         if (yieldTokenAmount == type(uint256).max)
-            yieldTokenAmount = yTokenInfoOf[pid].yieldToken.balanceOf(msg.sender);
-        UserInfo storage _userInfo = userInfo[pid][msg.sender];
+            yieldTokenAmount = yTokenInfoOf[pid].yieldToken.balanceOf(user);
+        UserInfo storage _userInfo = userInfo[pid][user];
         sushiReward = _pendingSushiReward(pid, _userInfo.userAmount, _userInfo.rewardDebt);
         if (yieldTokenAmount > 0) sushiReward += yieldTokenAmount * sushiRewardPerYieldToken();
     }
 
-    function pendingYieldToken(uint256 pid) external view returns (uint256 yieldTokenAmount) {
-        UserInfo storage _userInfo = userInfo[pid][msg.sender];
+    function pendingYieldToken(uint256 pid, address user) external view returns (uint256 yieldTokenAmount) {
+        UserInfo storage _userInfo = userInfo[pid][user];
         uint256 totalLPAmount = masterChef.userInfo(pid, address(this)).amount;
 
         uint256 pendingAllRewards = masterChef.pendingSushi(pid, address(this));
